@@ -1,0 +1,22 @@
+{
+  "name": "airdrop-cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "merkletreejs": "^0.3.11",
+    "yargs": "^17.7.2"
+  },
+  "scripts": {
+    "start": "ts-node ./index.ts",
+    "dev": "ts-node-dev ./index.ts"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.1",
+    "@types/node": "^20.10.5",
+    "@types/yargs": "^17.0.32",
+    "node-ts": "^6.0.1",
+    "typescript": "^5.3.3"
+  }
+}
