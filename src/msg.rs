@@ -61,17 +61,18 @@ mod tests {
 
     #[test]
     fn can_validate_proof() {
-        let m_root = "cbb6637cb3044364f16ddeddfae53efbaeeb08cf76ba364c9d8f8af7081dd855".to_string();
+        let m_root = "3a1cf2a6d59ba25658449800c9ba1a9346e3072386e6e3862a075b789b5eeeda".to_string();
 
         let proof: Vec<String> = vec![
-            "8bd1a3b12cb2fd35eda1fd59edb390045a85e88304d4d10a4494907627cff5e5".to_string(),
-            "ff245e84595d53a3356fddcf73f177b130670f26b82206b1040f0c4de07aa8ea".to_string(),
+            "b54aa6e2bebfb1df809051efe57d95bee5cffb7d89cafc402f8663de4af135b1".to_string(),
+            "3388109033b3b507b472e280438ad3be08f205004c1b14edbb1c7dd2ede80ed9".to_string(),
+            "fbbced22b298fa3de1228f15590cead614aedd07cbfe4961a8f0ce62257a4fbf".to_string(),
         ];
 
         let claim_msg = ClaimMsg {
             proof,
-            claimer_addr: "inj1yyy".to_string(),
-            amount: Uint128::new(10),
+            claimer_addr: "inj1q08vl6nwcqe9hm29pg6ral02uh45rnakcuhajf".to_string(),
+            amount: Uint128::new(100000000),
         };
 
         assert!(claim_msg.validate_proof(m_root));

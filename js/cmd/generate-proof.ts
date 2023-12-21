@@ -18,32 +18,22 @@ export const builder = {
 
 export const handler = async function (argv: any) {
   let leaves = [
-    // Inj addresses
-    "inj1xxx:10",
-    "inj1yyy:10",
-    // Chihuahua addresses
-    "chihuahua1xxx:10",
-    "chihuahua1yyy:10",
+    "inj1tlqtznd9gh0a53krerduzdsfadafamag0svccu:100000000", // YoshiMitsu
+    "inj1q08vl6nwcqe9hm29pg6ral02uh45rnakcuhajf:100000000", // user1
+    "inj1gfy4t9a9fafhf740tvxc0qw257ypnu8ppdqflm:100000000", // user2
+    "inj18f2tffku9cqnyup73sx8qyac4cnk6xxj886a8w:100000000", // user3
+    "inj1wmpgeccf07zyew0zvr5qy3wynjervphvhjf945:100000000", // user4
   ].map((x) => SHA256(x));
 
-  // let leaves = [
-  //   "8bd1a3b12cb2fd35eda1fd59edb390045a85e88304d4d10a4494907627cff5e5",
-  //   "ff245e84595d53a3356fddcf73f177b130670f26b82206b1040f0c4de07aa8ea",
-  // ];
-
-  const tree = new MerkleTree(leaves, SHA256, {});
+  const tree = new MerkleTree(leaves, SHA256, {
+    sort: true,
+  });
   const root = tree.getRoot().toString("hex");
-  const leaf = SHA256("inj1yyy:10");
+  const leaf = leaves[1];
   let proof = tree.getProof(leaf as any);
 
-  // proof.map((x: any) => {lol: x, str: x.data.toString()});
-  // proof.map((x: any) => { ...x});
-  console.log("root:", root);
+  console.log(`root: "${root}"`);
   for (const p of proof) {
-    console.log(p.data.toString("hex"));
+    console.log(`"${p.data.toString("hex")}",`);
   }
-
-  // console.log(proof.toString());
-
-  // const { net, amount, mnemonic } = argv;
 };
