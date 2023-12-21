@@ -1,11 +1,11 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{BankMsg, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
 use cw2::set_contract_version;
 
 use crate::error::ContractError;
 use crate::msg::{ClaimMsg, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{Config, CONFIG};
+use crate::state::{Config, CLAIMED_ADDRESSES, CONFIG};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:cw-tf-merkle-airdrop";
@@ -23,6 +23,7 @@ pub fn instantiate(
     let cfg = Config {
         merkle_root: msg.merkle_root,
         owner: info.sender.clone(),
+        native_token: msg.native_token,
     };
     CONFIG.save(deps.storage, &cfg)?;
 
@@ -45,16 +46,36 @@ pub fn execute(
 
 pub fn execute_claim(
     deps: DepsMut,
-    _info: MessageInfo,
-    msg: ClaimMsg,
+    info: MessageInfo,
+    claim_msg: ClaimMsg,
 ) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage).unwrap();
 
-    if !msg.validate_proof(config.merkle_root) {
+    let claimed = CLAIMED_ADDRESSES.may_load(deps.storage, claim_msg.claimer_addr.as_str())?;
+    if claimed.is_some() {
+        return Err(ContractError::Claimed {});
+    }
+
+    if !claim_msg.validate_proof(config.merkle_root) {
         return Err(ContractError::InvalidProof {});
     }
 
-    Ok(Response::new().add_attribute("action", "claim"))
+    CLAIMED_ADDRESSES.save(deps.storage, claim_msg.claimer_addr.as_str(), &true)?;
+
+    let msg = BankMsg::Send {
+        to_address: claim_msg.claimer_addr,
+        amount: vec![Coin {
+            denom: config.native_token,
+            amount: claim_msg.amount,
+        }],
+    };
+
+    Ok(Response::new()
+        .add_message(msg)
+        .add_attribute("action", "claim")
+        .add_attribute("address", info.sender.to_string())
+        .add_attribute("amount", claim_msg.amount)
+        .add_attribute("action", "claim"))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -73,12 +94,12 @@ mod tests {
     use cosmwasm_std::{coins, Uint128};
 
     #[test]
-    fn test_claim() {
+    fn cain_claim_native_token() {
         let merkle_root =
             "cbb6637cb3044364f16ddeddfae53efbaeeb08cf76ba364c9d8f8af7081dd855".to_string();
         let mut deps = mock_dependencies();
         let info = mock_info(
-            &"ADMIN".to_string(),
+            &"admin1".to_string(),
             &coins(21_000_000, "factory/inj1admin/utoken"),
         );
 
@@ -88,7 +109,7 @@ mod tests {
         ];
 
         let claim_msg = ClaimMsg {
-            proof,
+            proof: proof.clone(),
             claimer_addr: "inj1yyy".to_string(),
             amount: Uint128::new(10),
         };
@@ -96,19 +117,22 @@ mod tests {
         // Instantiate
         let instantiate_msg = InstantiateMsg {
             merkle_root: merkle_root,
+            native_token: "factory/inj1adminx/utoken".to_string(),
         };
         let res = instantiate(deps.as_mut(), mock_env(), info, instantiate_msg).unwrap();
         assert_eq!(0, res.messages.len());
 
         // Claim
-        let info = mock_info(&"Alice".to_string(), &coins(10, "factory/inj1admin/utoken"));
+        let info = mock_info(&"Alice".to_string(), &[]);
         let res = execute(
             deps.as_mut(),
             mock_env(),
             info.clone(),
-            ExecuteMsg::Claim(claim_msg),
+            ExecuteMsg::Claim(claim_msg.clone()),
         )
         .unwrap();
-        assert_eq!(0, res.messages.len());
+        assert_eq!(1, res.messages.len());
+
+        // println!("res: {:?}", res);
     }
 }

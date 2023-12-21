@@ -6,6 +6,7 @@ use sha2::Digest;
 #[cw_serde]
 pub struct InstantiateMsg {
     pub merkle_root: String,
+    pub native_token: String,
 }
 
 #[cw_serde]
@@ -59,7 +60,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_validate_proof() {
+    fn can_validate_proof() {
         let m_root = "cbb6637cb3044364f16ddeddfae53efbaeeb08cf76ba364c9d8f8af7081dd855".to_string();
 
         let proof: Vec<String> = vec![

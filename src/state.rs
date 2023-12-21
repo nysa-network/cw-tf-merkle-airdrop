@@ -7,6 +7,7 @@ use cw_storage_plus::{Item, Map};
 pub struct Config {
     pub merkle_root: String,
     pub owner: Addr,
+    pub native_token: String,
 }
 
 pub const CONFIG: Item<Config> = Item::new("config");
