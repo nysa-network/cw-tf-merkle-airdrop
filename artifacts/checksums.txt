@@ -1,1 +1,0 @@
-497703c5ae5ba47560d9b69fa0763fe471f01d4e848dd6b900df47fbe644d300  cw_tf_merkle_airdrop.wasm
