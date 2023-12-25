@@ -11,7 +11,10 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum QueryMsg {}
+pub enum QueryMsg {
+    #[returns(bool)]
+    HasClaimed { claimer_addr: String },
+}
 
 #[cw_serde]
 pub enum ExecuteMsg {

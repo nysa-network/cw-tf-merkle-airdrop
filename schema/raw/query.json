@@ -1,6 +1,27 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "QueryMsg",
-  "type": "string",
-  "enum": []
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "has_claimed"
+      ],
+      "properties": {
+        "has_claimed": {
+          "type": "object",
+          "required": [
+            "claimer_addr"
+          ],
+          "properties": {
+            "claimer_addr": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
 }

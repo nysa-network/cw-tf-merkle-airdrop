@@ -1,5 +1,5 @@
 #[cfg(not(feature = "library"))]
-use cosmwasm_std::entry_point;
+use cosmwasm_std::{entry_point, to_json_binary};
 use cosmwasm_std::{BankMsg, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
 use cw2::set_contract_version;
 
@@ -79,8 +79,16 @@ pub fn execute_claim(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
-    unimplemented!()
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::HasClaimed { claimer_addr } => query_has_claimed(deps, claimer_addr),
+    }
+}
+
+pub fn query_has_claimed(deps: Deps, addr: String) -> StdResult<Binary> {
+    let claimed = CLAIMED_ADDRESSES.may_load(deps.storage, addr.as_str())?;
+
+    to_json_binary(&claimed.is_some())
 }
 
 // TESTS
