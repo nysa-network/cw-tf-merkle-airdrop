@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "InstantiateMsg",
+  "type": "object",
+  "required": [
+    "merkle_root",
+    "native_token"
+  ],
+  "properties": {
+    "merkle_root": {
+      "type": "string"
+    },
+    "native_token": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
